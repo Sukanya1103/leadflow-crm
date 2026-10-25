@@ -150,7 +150,7 @@ _Add screenshots of the dashboard, pipeline and lead details page here._
 
 ## Author
 
-**Sukanya**
+**Sukanya Rana**
 GitHub: [@Sukanya1103](https://github.com/Sukanya1103)
 
 ---
