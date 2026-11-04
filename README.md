@@ -180,5 +180,3 @@ GitHub: [@Sukanya1103](https://github.com/Sukanya1103)
 ## License
 
 This project is built for educational purposes as part of a college project.
-
-This project is built for educational purposes as part of a college project.
