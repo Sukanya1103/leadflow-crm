@@ -8,11 +8,13 @@ A web-based **Customer Relationship Management (CRM) and Sales Pipeline** system
 
 - **Authentication and Role-Based Access:** secure JWT login with separate permissions for Admin, Manager and Sales Representative
 - **Lead Management:** create, edit, search, filter and delete leads
-- **Lead Assignment and Follow-up Reminders:** assign leads to sales reps and get reminders for upcoming follow-ups
-- **Drag-and-Drop Sales Pipeline:** move deals across stages: Prospect, Qualification, Proposal, Negotiation, Closed Won / Lost
+- **Lead Assignment:** admins and managers assign leads to sales reps
+- **Drag-and-Drop Sales Pipeline:** Kanban board with stages: Prospect, Qualification, Proposal, Negotiation, Closed Won, Closed Lost
 - **Customer Interaction History:** timeline of calls, emails, meetings and notes for every lead
-- **Dashboard and Analytics:** active leads, pipeline funnel, monthly sales and lead source charts
-- **Team-wise Sales Reports:** compare performance and revenue across teams
+- **Follow-up Reminders:** notification bell for overdue and due-today follow-ups, plus an optional daily email digest
+- **Dashboard and Analytics:** stat cards, pipeline chart, monthly sales, lead sources and upcoming follow-ups
+- **Team Management:** create teams, assign managers and members, change roles, activate or deactivate users
+- **Team-wise Sales Reports:** revenue, conversion rate and sales leaderboard with a date range filter
 
 ---
 
@@ -20,11 +22,11 @@ A web-based **Customer Relationship Management (CRM) and Sales Pipeline** system
 
 | Layer | Technologies |
 |---|---|
-| Frontend | React.js (Vite), Tailwind CSS, Recharts, React Router, Axios |
+| Frontend | React (Vite), Tailwind CSS, Zustand, TanStack Query, React Router, Axios, Recharts, @hello-pangea/dnd |
 | Backend | Node.js, Express.js |
 | Database | MongoDB with Mongoose |
-| Auth | JSON Web Tokens (JWT), bcrypt |
-| Others | node-cron, Nodemailer, dnd-kit / hello-pangea-dnd |
+| Auth | JSON Web Tokens (JWT), bcryptjs |
+| Others | node-cron, Nodemailer |
 
 ---
 
@@ -32,23 +34,22 @@ A web-based **Customer Relationship Management (CRM) and Sales Pipeline** system
 
 ```
 leadflow-crm/
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── context/
-│   │   ├── services/
-│   │   └── App.jsx
-│   └── package.json
-├── server/                 # Node + Express backend
-│   ├── config/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── utils/
-│   └── server.js
-└── README.md
+├── frontend/                  # React app (Vite)
+│   └── src/
+│       ├── components/        # Sidebar, Navbar, forms, charts cards
+│       ├── hooks/             # TanStack Query hooks
+│       ├── pages/             # Dashboard, Leads, Pipeline, Reports, Team...
+│       ├── services/          # Axios instance
+│       ├── store/             # Zustand auth store
+│       └── App.jsx
+└── backend/                   # Express API
+    ├── config/                # Database connection
+    ├── controllers/
+    ├── middleware/            # Auth and role checks
+    ├── models/                # User, Team, Lead, Activity
+    ├── routes/
+    ├── utils/                 # Token generator, reminder job
+    └── server.js
 ```
 
 ---
@@ -58,33 +59,30 @@ leadflow-crm/
 ### Prerequisites
 
 - Node.js (v18 or above)
-- MongoDB (local installation or MongoDB Atlas)
+- A MongoDB database (MongoDB Atlas free cluster or local MongoDB)
 - Git
 
-### Installation
-
-1. Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Sukanya1103/leadflow-crm.git
 cd leadflow-crm
 ```
 
-2. Set up the backend
+### 2. Set up the backend
 
 ```bash
-cd server
+cd backend
 npm install
 ```
 
-Create a `.env` file inside `server/`:
+Create a `.env` file inside `backend/` (use `.env.example` as a template):
 
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-EMAIL_USER=your_email
-EMAIL_PASS=your_email_app_password
+JWT_SECRET=your_long_random_secret
+JWT_EXPIRES_IN=7d
 ```
 
 Start the server:
@@ -93,32 +91,31 @@ Start the server:
 npm run dev
 ```
 
-3. Set up the frontend
+### 3. Set up the frontend
+
+Open a new terminal:
 
 ```bash
-cd ../client
+cd frontend
 npm install
 npm run dev
 ```
 
 The app runs at `http://localhost:5173` and the API at `http://localhost:5000`.
 
----
+> The **first user who registers automatically becomes the Admin**. Everyone after that registers as a Sales Rep, and the Admin can change roles from the Team page.
 
-## API Overview
+### Optional: email reminders
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login and receive a JWT |
-| GET | `/api/leads` | Get all leads (role-based) |
-| POST | `/api/leads` | Create a lead |
-| PATCH | `/api/leads/:id/stage` | Update pipeline stage |
-| PATCH | `/api/leads/:id/assign` | Assign lead to a user |
-| GET | `/api/leads/:id/activities` | Get interaction history |
-| POST | `/api/leads/:id/activities` | Log a call, email, meeting or note |
-| GET | `/api/dashboard/stats` | Dashboard statistics |
-| GET | `/api/reports/team` | Team-wise sales report |
+Add these to `backend/.env` to receive a daily follow-up digest at 9 AM IST (without them, reminders still show in the app):
+
+```env
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+EMAIL_FROM=LeadFlow CRM <your_email@gmail.com>
+```
 
 ---
 
@@ -126,35 +123,62 @@ The app runs at `http://localhost:5173` and the API at `http://localhost:5000`.
 
 | Role | Access |
 |---|---|
-| **Admin** | Full access: users, teams, all leads and reports |
-| **Manager** | Manage own team, assign leads, view team reports |
-| **Sales Rep** | View and update only own assigned leads |
+| **Admin** | Full access: all leads, users, teams, roles and reports |
+| **Manager** | All leads, assign and delete leads, reports (own team only if a team is set) |
+| **Sales Rep** | View and update only the leads assigned to them |
+
+---
+
+## API Overview
+
+All routes except register and login need the header `Authorization: Bearer <token>`.
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| POST | `/api/auth/register` | Register a new user | Public |
+| POST | `/api/auth/login` | Login and receive a JWT | Public |
+| GET | `/api/auth/me` | Current user profile | Logged in |
+| GET | `/api/leads` | List leads (search and filters) | Logged in |
+| POST | `/api/leads` | Create a lead | Logged in |
+| GET | `/api/leads/:id` | Lead details | Logged in |
+| PUT | `/api/leads/:id` | Update a lead | Logged in |
+| PATCH | `/api/leads/:id/stage` | Change pipeline stage | Logged in |
+| PATCH | `/api/leads/:id/assign` | Assign a lead to a user | Admin, Manager |
+| DELETE | `/api/leads/:id` | Delete a lead | Admin, Manager |
+| GET | `/api/activities/lead/:leadId` | Interaction history of a lead | Logged in |
+| POST | `/api/activities/lead/:leadId` | Log a call, email, meeting or note | Logged in |
+| DELETE | `/api/activities/:id` | Delete an activity | Owner, Admin, Manager |
+| GET | `/api/dashboard/stats` | Dashboard statistics | Logged in |
+| GET | `/api/reminders` | Your due and overdue follow-ups | Logged in |
+| POST | `/api/reminders/send-now` | Run the reminder email job now | Admin |
+| GET | `/api/users` | List users | Admin, Manager |
+| PATCH | `/api/users/:id` | Change role, team or status | Admin |
+| GET | `/api/teams` | List teams | Admin, Manager |
+| POST | `/api/teams` | Create a team | Admin |
+| PUT | `/api/teams/:id` | Update a team | Admin |
+| DELETE | `/api/teams/:id` | Delete a team | Admin |
+| GET | `/api/reports/team` | Team-wise sales report | Admin, Manager |
 
 ---
 
 ## Roadmap
 
 - [ ] CSV import / export of leads
-- [ ] Email notifications for follow-ups
 - [ ] Audit logs
 - [ ] Docker setup
 - [ ] Deployment (Vercel + Render + MongoDB Atlas)
 
 ---
 
-## Screenshots
-
-_Add screenshots of the dashboard, pipeline and lead details page here._
-
----
-
 ## Author
 
-**Sukanya Rana**
+**Sukanya**
 GitHub: [@Sukanya1103](https://github.com/Sukanya1103)
 
 ---
 
 ## License
+
+This project is built for educational purposes as part of a college project.
 
 This project is built for educational purposes as part of a college project.
