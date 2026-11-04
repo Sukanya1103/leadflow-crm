@@ -22,18 +22,6 @@ A web-based **Customer Relationship Management (CRM) and Sales Pipeline** system
 
 ---
 
-## Screenshots
-
-| Dashboard | Sales Pipeline |
-|---|---|
-| ![Dashboard](docs/dashboard.png) | ![Pipeline](docs/pipeline.png) |
-
-| Lead Details | Team Reports |
-|---|---|
-| ![Lead details](docs/lead-details.png) | ![Reports](docs/reports.png) |
-
----
-
 ## Tech Stack
 
 | Layer | Technologies |
