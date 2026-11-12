@@ -1,28 +1,50 @@
-# LeadFlow CRM
+# 📈 LeadFlow CRM
 
-A web-based **Customer Relationship Management (CRM) and Sales Pipeline** system built with the **MERN stack**. LeadFlow CRM helps sales teams capture leads, assign them to team members, track deals through a drag-and-drop pipeline, log customer interactions, and view sales analytics, all in one place.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 
-**Live demo:** [https://leadflow-crm-seven-tau.vercel.app](https://leadflow-crm-seven-tau.vercel.app)
+A web-based **Customer Relationship Management (CRM) and Sales Pipeline** system built with the MERN stack. LeadFlow CRM helps sales teams capture leads, assign them to team members, track deals through a drag-and-drop pipeline, log customer interactions, and view sales analytics, all in one place.
 
-> The backend runs on a free hosting plan and goes to sleep when idle, so the first request after a break can take up to a minute.
+### 🔗 [**Live Demo → leadflow-crm-seven-tau.vercel.app**](https://leadflow-crm-seven-tau.vercel.app)
 
----
-
-## Features
-
-- **Authentication and Role-Based Access:** secure JWT login with separate permissions for Admin, Manager and Sales Representative
-- **Lead Management:** create, edit, search, filter and delete leads
-- **Lead Assignment:** admins and managers assign leads to sales reps
-- **Drag-and-Drop Sales Pipeline:** Kanban board with stages: Prospect, Qualification, Proposal, Negotiation, Closed Won, Closed Lost
-- **Customer Interaction History:** timeline of calls, emails, meetings and notes for every lead
-- **Follow-up Reminders:** notification bell for overdue and due-today follow-ups, plus an optional daily email digest
-- **Dashboard and Analytics:** stat cards, pipeline chart, monthly sales, lead sources and upcoming follow-ups
-- **Team Management:** create teams, assign managers and members, change roles, activate or deactivate users
-- **Team-wise Sales Reports:** revenue, conversion rate and sales leaderboard with a date range filter
+> ⏳ The backend runs on a free hosting plan and sleeps when idle, so the first request after a break can take up to a minute.
 
 ---
 
-## Tech Stack
+## 📑 Table of Contents
+
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [User Roles](#-user-roles)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Deployment](#-deployment)
+- [API Overview](#-api-overview)
+- [Roadmap](#-roadmap)
+
+---
+
+## ✨ Features
+
+- 🔐 **Authentication and role-based access:** secure JWT login with separate permissions for Admin, Manager, and Sales Representative
+- 👤 **Lead management:** create, edit, search, filter, and delete leads
+- 🎯 **Lead assignment:** admins and managers assign leads to sales reps
+- 🗂️ **Drag-and-drop sales pipeline:** Kanban board with the stages Prospect, Qualification, Proposal, Negotiation, Closed Won, and Closed Lost
+- 🕘 **Customer interaction history:** a timeline of calls, emails, meetings, and notes for every lead
+- 🔔 **Follow-up reminders:** a notification bell for overdue and due-today follow-ups, plus an optional daily email digest
+- 📊 **Dashboard and analytics:** stat cards, pipeline chart, monthly sales, lead sources, and upcoming follow-ups
+- 👥 **Team management:** create teams, assign managers and members, change roles, and activate or deactivate users
+- 🏆 **Team-wise sales reports:** revenue, conversion rate, and a sales leaderboard with a date range filter
+
+---
+
+## 🧰 Tech Stack
 
 | Layer | Technologies |
 |---|---|
@@ -35,7 +57,17 @@ A web-based **Customer Relationship Management (CRM) and Sales Pipeline** system
 
 ---
 
-## Project Structure
+## 👥 User Roles
+
+| Role | Access |
+|---|---|
+| **Admin** | Full access: all leads, users, teams, roles, and reports |
+| **Manager** | All leads, assign and delete leads, reports (own team only if a team is set) |
+| **Sales Rep** | View and update only the leads assigned to them |
+
+---
+
+## 📁 Project Structure
 
 ```
 leadflow-crm/
@@ -59,7 +91,7 @@ leadflow-crm/
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -109,17 +141,19 @@ npm run dev
 
 The app runs at `http://localhost:5173` and the API at `http://localhost:5000`.
 
-To point the frontend to a different API, create `frontend/.env` with:
+To point the frontend to a different API, create `frontend/.env`:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-> The **first user who registers automatically becomes the Admin**. Everyone after that registers as a Sales Rep, and the Admin can change roles from the Team page.
+### 4. First login
+
+The **first user who registers automatically becomes the Admin**. Everyone after that registers as a Sales Rep, and the Admin can change roles from the Team page.
 
 ### Optional: email reminders
 
-Add these to `backend/.env` to receive a daily follow-up digest at 9 AM IST (without them, reminders still show in the app):
+Add these to `backend/.env` to receive a daily follow-up digest at 9 AM IST. Without them, reminders still show in the app.
 
 ```env
 EMAIL_HOST=smtp.gmail.com
@@ -131,21 +165,21 @@ EMAIL_FROM=LeadFlow CRM <your_email@gmail.com>
 
 ---
 
-## Environment Variables
+## 🔧 Environment Variables
 
-**Backend (`backend/.env`)**
+**Backend** (`backend/.env`)
 
 | Variable | Description |
 |---|---|
-| `PORT` | Server port (default 5000) |
+| `PORT` | Server port (default `5000`) |
 | `MONGO_URI` | MongoDB connection string |
 | `JWT_SECRET` | Secret used to sign tokens |
 | `JWT_EXPIRES_IN` | Token lifetime, e.g. `7d` |
 | `CLIENT_URL` | Allowed frontend origin(s) for CORS, comma separated, no trailing slash |
-| `EMAIL_*` | Optional, SMTP settings for reminder emails |
-| `REMINDER_CRON` | Optional, cron schedule of the reminder job (default `0 9 * * *`) |
+| `EMAIL_*` | Optional: SMTP settings for reminder emails |
+| `REMINDER_CRON` | Optional: cron schedule of the reminder job (default `0 9 * * *`) |
 
-**Frontend (`frontend/.env`)**
+**Frontend** (`frontend/.env`)
 
 | Variable | Description |
 |---|---|
@@ -153,7 +187,7 @@ EMAIL_FROM=LeadFlow CRM <your_email@gmail.com>
 
 ---
 
-## Deployment
+## ☁️ Deployment
 
 | Part | Platform | Notes |
 |---|---|---|
@@ -163,17 +197,7 @@ EMAIL_FROM=LeadFlow CRM <your_email@gmail.com>
 
 ---
 
-## User Roles
-
-| Role | Access |
-|---|---|
-| **Admin** | Full access: all leads, users, teams, roles and reports |
-| **Manager** | All leads, assign and delete leads, reports (own team only if a team is set) |
-| **Sales Rep** | View and update only the leads assigned to them |
-
----
-
-## API Overview
+## 🔌 API Overview
 
 All routes except register and login need the header `Authorization: Bearer <token>`.
 
@@ -190,13 +214,13 @@ All routes except register and login need the header `Authorization: Bearer <tok
 | PATCH | `/api/leads/:id/assign` | Assign a lead to a user | Admin, Manager |
 | DELETE | `/api/leads/:id` | Delete a lead | Admin, Manager |
 | GET | `/api/activities/lead/:leadId` | Interaction history of a lead | Logged in |
-| POST | `/api/activities/lead/:leadId` | Log a call, email, meeting or note | Logged in |
+| POST | `/api/activities/lead/:leadId` | Log a call, email, meeting, or note | Logged in |
 | DELETE | `/api/activities/:id` | Delete an activity | Owner, Admin, Manager |
 | GET | `/api/dashboard/stats` | Dashboard statistics | Logged in |
 | GET | `/api/reminders` | Your due and overdue follow-ups | Logged in |
 | POST | `/api/reminders/send-now` | Run the reminder email job now | Admin |
 | GET | `/api/users` | List users | Admin, Manager |
-| PATCH | `/api/users/:id` | Change role, team or status | Admin |
+| PATCH | `/api/users/:id` | Change role, team, or status | Admin |
 | GET | `/api/teams` | List teams | Admin, Manager |
 | POST | `/api/teams` | Create a team | Admin |
 | PUT | `/api/teams/:id` | Update a team | Admin |
@@ -205,7 +229,7 @@ All routes except register and login need the header `Authorization: Bearer <tok
 
 ---
 
-## Roadmap
+## 🗺️ Roadmap
 
 - [x] Deployment (Vercel + Render + MongoDB Atlas)
 - [ ] CSV import / export of leads
@@ -214,13 +238,12 @@ All routes except register and login need the header `Authorization: Bearer <tok
 
 ---
 
-## Author
+## 👩‍💻 Author
 
-**Sukanya**
-GitHub: [@Sukanya1103](https://github.com/Sukanya1103)
+**Sukanya Rana** — [GitHub](https://github.com/Sukanya1103) · [LinkedIn](https://www.linkedin.com/in/sukanya-rana-719832345)
 
 ---
 
-## License
+## 📄 License
 
 This project is built for educational purposes as part of a college project.
